@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorías Einstein</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 600px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h2 {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        p {
+            text-align: center;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        button, input, textarea, select {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            cursor: pointer;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const app = document.getElementById('app');
+            const courses = ['Pre cálculo', 'Cálculo 1', 'Álgebra Lineal', 'Ecuaciones Diferenciales'];
+
+            const renderCourses = () => {
+                const container = document.createElement('div');
+                const title = document.createElement('h1');
+                title.textContent = 'Tutorías Einstein';
+                container.appendChild(title);
+
+                const tutorInfo = document.createElement('div');
+                const tutorName = document.createElement('h2');
+                tutorName.textContent = 'Tutor: Jose Chaves Chaves, estudiante de Meteorología e Ingeniería Industrial';
+                tutorInfo.appendChild(tutorName);
+
+                const tutorCost = document.createElement('p');
+                tutorCost.textContent = 'Costo de la tutoría: 5000 colones la hora';
+                tutorInfo.appendChild(tutorCost);
+
+                const tutorContact = document.createElement('p');
+                tutorContact.textContent = 'Contacto: 84249434';
+                tutorInfo.appendChild(tutorContact);
+
+                const tutorEmail = document.createElement('p');
+                tutorEmail.textContent = 'Correo: jochcha@gmail.com';
+                tutorInfo.appendChild(tutorEmail);
+
+                const tutorFacebook = document.createElement('p');
+                tutorFacebook.innerHTML = 'Facebook: <a href="https://www.facebook.com/jochcha" target="_blank">www.facebook.com/jochcha</a>';
+                tutorInfo.appendChild(tutorFacebook);
+
+                container.appendChild(tutorInfo);
+
+                courses.forEach(course => {
+                    const button = document.createElement('button');
+                    button.textContent = course;
+                    button.addEventListener('click', () => renderDetails(course));
+                    container.appendChild(button);
+                });
+
+                app.innerHTML = '';
+                app.appendChild(container);
+            };
+
+            const renderDetails = (course) => {
+                const container = document.createElement('div');
+
+                const title = document.createElement('h1');
+                title.textContent = `Solicitud de tutoría para ${course}`;
+                container.appendChild(title);
+
+                const form = document.createElement('form');
+                form.action = "https://formspree.io/f/xkgwgnkw"; // Reemplaza {YOUR_FORM_ID} con tu ID de Formspree
+                form.method = "POST";
+
+                const courseInput = document.createElement('input');
+                courseInput.type = 'hidden';
+                courseInput.name = 'Curso';
+                courseInput.value = course;
+                form.appendChild(courseInput);
+
+                const nameInput = document.createElement('textarea');
+                nameInput.name = 'Nombre Completo';
+                nameInput.placeholder = 'Nombre Completo';
+                form.appendChild(nameInput);
+
+                const phoneInput = document.createElement('textarea');
+                phoneInput.name = 'Teléfono';
+                phoneInput.placeholder = 'Teléfono';
+                form.appendChild(phoneInput);
+
+                const dateInput = document.createElement('input');
+                dateInput.type = 'date';
+                dateInput.name = 'Fecha';
+                dateInput.addEventListener('change', (e) => updateAvailability(e.target.value));
+                form.appendChild(dateInput);
+
+                const timeSelect = document.createElement('select');
+                timeSelect.name = 'Hora';
+                form.appendChild(timeSelect);
+
+                const detailsInput = document.createElement('textarea');
+                detailsInput.name = 'Detalles';
+                detailsInput.placeholder = 'Detalles adicionales';
+                form.appendChild(detailsInput);
+
+                const submitButton = document.createElement('button');
+                submitButton.type = 'submit';
+                submitButton.textContent = 'Enviar Solicitud';
+                form.appendChild(submitButton);
+
+                const backButton = document.createElement('button');
+                backButton.type = 'button';
+                backButton.textContent = 'Volver';
+                backButton.addEventListener('click', renderCourses);
+                form.appendChild(backButton);
+
+                container.appendChild(form);
+                app.innerHTML = '';
+                app.appendChild(container);
+            };
+
+            const updateAvailability = (selectedDate) => {
+                fetch('disponibilidad.json')
+                    .then(response => response.json())
+                    .then(data => {
+                        const timeSelect = document.querySelector('select[name="Hora"]');
+                        timeSelect.innerHTML = '';
+
+                        if (data[selectedDate]) {
+                            data[selectedDate].forEach(time => {
+                                const option = document.createElement('option');
+                                option.value = time;
+                                option.textContent = time;
+                                timeSelect.appendChild(option);
+                            });
+                        } else {
+                            const option = document.createElement('option');
+                            option.textContent = 'No hay disponibilidad';
+                            timeSelect.appendChild(option);
+                        }
+                    });
+            };
+
+            renderCourses();
+        });
+    </script>
+</body>
+</html>
